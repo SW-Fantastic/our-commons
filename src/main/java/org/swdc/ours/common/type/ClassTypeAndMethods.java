@@ -155,6 +155,32 @@ public class ClassTypeAndMethods {
     }
 
 
+    public static Boolean isCollectionType(Class clazz) {
+        return Collection.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz);
+    }
+
+    public static Boolean isList(Class clazz) {
+        return List.class.isAssignableFrom(clazz);
+    }
+
+    public static Boolean isMap(Class clazz) {
+        return Map.class.isAssignableFrom(clazz);
+    }
+
+    public static List<Class> getFieldParameters(Field field) {
+        ParameterizedType parameterizedType = (ParameterizedType)field.getGenericType();
+        Type[] types = parameterizedType.getActualTypeArguments();
+        List<Class> classes = new ArrayList<>();
+        if (types == null || types.length == 0) {
+            return classes;
+        }
+        for (Type type : types) {
+            classes.add((Class) type);
+        }
+        return classes;
+    }
+
+
     /**
      * 通过Jackson的ObjectMapper解码String，让他可以作为Method
      * 的参数被使用。

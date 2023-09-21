@@ -8,6 +8,10 @@ import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.*;
 import java.util.*;
 
+
+/**
+ * 与Class/Type等Java类型相关的通用反射方法。
+ */
 public class ClassTypeAndMethods {
 
     /**
@@ -155,18 +159,38 @@ public class ClassTypeAndMethods {
     }
 
 
+    /**
+     * 判断此类是否为集合类型
+     * @param clazz class对象
+     * @return 是否为集合类型
+     */
     public static Boolean isCollectionType(Class clazz) {
         return Collection.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz);
     }
 
+    /**
+     * 判断此类是否为List类型
+     * @param clazz 类对象
+     * @return 是否为List类型
+     */
     public static Boolean isList(Class clazz) {
         return List.class.isAssignableFrom(clazz);
     }
 
+    /**
+     * 判断此类是否为Map类型
+     * @param clazz 类对象
+     * @return 是否为Map类型
+     */
     public static Boolean isMap(Class clazz) {
         return Map.class.isAssignableFrom(clazz);
     }
 
+    /**
+     * 读取此Field类型的泛型的真实类型。
+     * @param field Field对象
+     * @return 真实类型的Class对象列表
+     */
     public static List<Class> getFieldParameters(Field field) {
         ParameterizedType parameterizedType = (ParameterizedType)field.getGenericType();
         Type[] types = parameterizedType.getActualTypeArguments();

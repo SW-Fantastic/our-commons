@@ -9,7 +9,7 @@ import java.util.Map;
  */
 public class Converters {
 
-    private Map<ConvertersKey,Converter> converters = new HashMap<>();
+    private final Map<ConvertersKey,Converter> converters = new HashMap<>();
 
     public Converters() {
         this.addConverter(String.class,int.class, this::covertIntFormString)
@@ -90,11 +90,28 @@ public class Converters {
 
     }
 
+    /**
+     * 添加一个Converter
+     * @param t 被转换的类型的Class对象
+     * @param r 转换的结果类型的Class对象
+     * @param converter 转换器的实现对象
+     * @return 本对象，这是一个Builder模式，可以继续对本对象添加其他Converter。
+     * @param <T> 被转换的类型
+     * @param <R> 转换的结果类型
+     */
     public <T,R> Converters addConverter(Class<T> t, Class<R> r, Converter<T,R> converter) {
         converters.put(ConvertersKey.of(t,r),converter);
         return this;
     }
 
+    /**
+     * 获取Convert。
+     * @param t 被转换类型的Class对象
+     * @param r 转换结果类型的Class对象
+     * @return 转换器，如果不存在转换器则会返回空（null）
+     * @param <T> 被转换类型
+     * @param <R> 转换的结果类型
+     */
     public <T,R> Converter<T,R> getConverter(Class<T> t, Class<R> r) {
         return converters.get(ConvertersKey.of(t,r));
     }

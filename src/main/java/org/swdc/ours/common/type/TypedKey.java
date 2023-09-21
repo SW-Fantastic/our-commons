@@ -5,6 +5,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 用作Property的Key的类型
+ * 它是一种类Tuple的类型，对于一个Class对象和一个String对象组成的一个键值对，
+ * 仅允许存在唯一的一个TypedKey对象。
+ *
+ * @param <T>
+ */
 public class TypedKey<T> {
 
     private static Map<Class, Map<String,TypedKey>> keys = new ConcurrentHashMap<>();

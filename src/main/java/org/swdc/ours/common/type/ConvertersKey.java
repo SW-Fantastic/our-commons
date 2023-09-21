@@ -4,6 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Converter的Key。
+ * 是一种类Tuple类型，对于一个Converter来说，每两个顺序不同的Class为一组，
+ * 本类应该通过静态方法返回对于每一组Class来说唯一的ConvertersKey对象。
+ */
 public class ConvertersKey {
 
     private static Map<Class,Map<Class,ConvertersKey>> keys = new ConcurrentHashMap();

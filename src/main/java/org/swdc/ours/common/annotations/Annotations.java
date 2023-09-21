@@ -1,8 +1,5 @@
 package org.swdc.ours.common.annotations;
 
-import org.swdc.ours.common.annotations.AliasFor;
-import org.swdc.ours.common.annotations.AnnotationDescription;
-
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;

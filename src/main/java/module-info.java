@@ -1,6 +1,5 @@
 module swdc.commons {
 
-
     requires com.fasterxml.jackson.core;
     requires com.fasterxml.jackson.databind;
     requires org.apache.commons.compress;

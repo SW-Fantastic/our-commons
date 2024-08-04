@@ -1,5 +1,6 @@
 package org.swdc.ours.common.type;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,6 +42,9 @@ public class Converters {
                 .addConverter(float.class,String.class,this::convertStringFormFloat)
                 .addConverter(String.class,Float.class,this::convertFloatFormString)
                 .addConverter(Float.class,String.class,this::convertStringFormFloat)
+
+                .addConverter(byte[].class,String.class, bytes -> new String(bytes, StandardCharsets.UTF_8))
+                .addConverter(String.class,byte[].class, str -> str.getBytes(StandardCharsets.UTF_8))
 
                 .addConverter(Integer.class, int.class, (i) -> i)
                 .addConverter(int.class, Integer.class, (i) -> i)

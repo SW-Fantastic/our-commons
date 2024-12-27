@@ -90,9 +90,33 @@ public class Converters {
                 .addConverter(Float.class,long.class, (f) -> f.longValue())
                 .addConverter(float.class, Long.class, (f) -> Float.valueOf(f).longValue())
                 .addConverter(float.class, long.class,(f) -> long.class.cast(f))
+
+                // int -> short
+                .addConverter(Integer.class,Short.class, i -> i.shortValue())
+                .addConverter(Integer.class,short.class, i -> i.shortValue())
+                .addConverter(int.class,Short.class, i -> Integer.valueOf(i).shortValue())
+                .addConverter(int.class, short.class, i -> Integer.valueOf(i).shortValue())
+
+                .addConverter(Short.class,Integer.class, i -> i.intValue())
+                .addConverter(Short.class,int.class, i -> i.intValue())
+                .addConverter(short.class,Integer.class, i -> Short.valueOf(i).intValue())
+                .addConverter(short.class, int.class, i -> Short.valueOf(i).intValue())
+
+                // boolean -> int
+                .addConverter(Boolean.class, Integer.class, i -> i ? 1 : 0)
+                .addConverter(boolean.class, Integer.class, i -> i ? 1 : 0)
+                .addConverter(Boolean.class, int.class, i -> i ? 1 : 0)
+                .addConverter(boolean.class, int.class, i -> i ? 1 : 0)
+
+                // boolean -> short
+                .addConverter(Boolean.class, Short.class, i -> Short.valueOf((short) (i ? 1 : 0)))
+                .addConverter(Boolean.class, short.class, i -> Short.valueOf((short) (i ? 1 : 0)))
+                .addConverter(boolean.class, Short.class, i -> Short.valueOf((short) (i ? 1 : 0)))
+                .addConverter(boolean.class, short.class, i -> Short.valueOf((short) (i ? 1 : 0)))
                 ;
 
     }
+
 
     /**
      * 添加一个Converter
@@ -121,7 +145,7 @@ public class Converters {
     }
 
     private int covertIntFormString(String val) {
-        return Integer.parseInt(val);
+        return (val == null || val.isBlank()) ? 0 : Integer.parseInt(val);
     }
 
     private double convertDoubleFormString(String val) {

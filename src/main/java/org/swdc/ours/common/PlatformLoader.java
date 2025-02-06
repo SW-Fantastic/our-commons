@@ -17,6 +17,12 @@ public class PlatformLoader {
             "amd64","x64","x86_64"
     );
 
+    /**
+     * 加载指定文件描述中的原生库
+     *
+     * @param desc 包含原生库路径的文件描述文件
+     * @throws RuntimeException 如果文件描述文件无法读取，或者无法找到适合当前操作系统的原生库，则抛出运行时异常
+     */
     public void load(File desc) {
         try {
 

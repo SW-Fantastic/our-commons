@@ -7,12 +7,17 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
  * 与Class/Type等Java类型相关的通用反射方法。
  */
 public class ClassTypeAndMethods {
+
+    private static ConcurrentHashMap<Class, List<Field>> cachedFields = new ConcurrentHashMap<>();
+
+    private static ConcurrentHashMap<Class, List<Method>> cachedMethods = new ConcurrentHashMap<>();
 
     /**
      * Lambda表达式转换为SerializedLambda对象。
@@ -79,20 +84,44 @@ public class ClassTypeAndMethods {
      * @return 方法列表
      */
     public static List<Method> findAllMethods(Class clazz) {
+        if (cachedMethods.containsKey(clazz)) {
+            return cachedMethods.get(clazz);
+        }
+
         List<Method> methodList = new ArrayList<>();
         Class current = clazz;
-
         while (current != null) {
-            if (current == Object.class) {
-                break;
-            }
-            Method[] methods = current.getMethods();
+            Method[] methods = current.getDeclaredMethods();
             for (Method method: methods) {
                 methodList.add(method);
             }
             current = current.getSuperclass();
         }
+        cachedMethods.put(clazz, methodList);
+
         return methodList;
+    }
+
+
+
+    public static List<Field> findAllFields(Class<?> clazz) {
+
+        if (cachedFields.containsKey(clazz)) {
+            return cachedFields.get(clazz);
+        }
+
+        List<Field> fieldList = new ArrayList<>();
+        Class current = clazz;
+        while (current != null) {
+            Field[] fields = current.getDeclaredFields();
+            for (Field field: fields) {
+                fieldList.add(field);
+            }
+            current = current.getSuperclass();
+        }
+        cachedFields.put(clazz, fieldList);
+        return fieldList;
+
     }
 
     /**
@@ -106,6 +135,7 @@ public class ClassTypeAndMethods {
                 type == double.class ||
                 type == char.class ||
                 type == byte.class ||
+                type == long.class ||
                 type == short.class) {
             return  true;
         }
@@ -124,6 +154,7 @@ public class ClassTypeAndMethods {
                 type == Character.class ||
                 type == Byte.class ||
                 type == Boolean.class||
+                type == Long.class ||
                 type == Short.class) {
             return  true;
         }
@@ -203,6 +234,21 @@ public class ClassTypeAndMethods {
         }
         return classes;
     }
+
+    public static List<Class> getReturningTypeParameters(Method method) {
+        Type returnType = method.getGenericReturnType();
+        if (returnType instanceof ParameterizedType) {
+            ParameterizedType type = (ParameterizedType) returnType;
+            Type[] types = type.getActualTypeArguments();
+            List<Class> classes = new ArrayList<>();
+            for (Type type1 : types) {
+                classes.add((Class) type1);
+            }
+            return classes;
+        }
+        return null;
+    }
+
 
 
     /**

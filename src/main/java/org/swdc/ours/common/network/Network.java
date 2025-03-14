@@ -1,5 +1,6 @@
 package org.swdc.ours.common.network;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.swdc.ours.common.type.ClassTypeAndMethods;
@@ -44,6 +45,7 @@ public class Network implements InvocationHandler {
         this.baseUrl = baseUrl;
         this.mapper = new ObjectMapper();
         mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
     }
 
@@ -109,7 +111,7 @@ public class Network implements InvocationHandler {
 
         url = url.replaceAll("/+", "/");
         if (baseUrl.endsWith("/")) {
-            url = baseUrl.substring(0, url.length() - 1) + url;
+            url = baseUrl.substring(0, baseUrl.length() - 1) + url;
         } else {
             url = baseUrl + url;
         }

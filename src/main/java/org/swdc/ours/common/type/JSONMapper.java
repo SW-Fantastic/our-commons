@@ -10,11 +10,15 @@ public class JSONMapper {
 
     private static ObjectMapper mapper;
 
+    private static void createMapper() {
+        mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+    }
+
     public static String writeString(Object obj) {
         if (mapper == null) {
-            mapper = new ObjectMapper();
-            mapper.registerModule(new JavaTimeModule());
-            mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+            createMapper();
         }
         try {
             return mapper.writeValueAsString(obj);
@@ -25,9 +29,7 @@ public class JSONMapper {
 
     public static byte[] writeBytes(Object obj) {
         if (mapper == null) {
-            mapper = new ObjectMapper();
-            mapper.registerModule(new JavaTimeModule());
-            mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+            createMapper();
         }
         try {
             return mapper.writeValueAsBytes(obj);
@@ -38,9 +40,7 @@ public class JSONMapper {
 
     public static <T> T readAsType(InputStream is, Class<T> returnType) {
         if (mapper == null) {
-            mapper = new ObjectMapper();
-            mapper.registerModule(new JavaTimeModule());
-            mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+            createMapper();
         }
         try {
             return mapper.readValue(is, returnType);

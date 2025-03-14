@@ -12,15 +12,18 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.client.methods.*;
 import org.apache.jackrabbit.webdav.lock.LockInfo;
+import org.swdc.ours.common.helper.ListenableInputStream;
+import org.swdc.ours.common.helper.ProgressDirection;
 import org.swdc.ours.common.type.ClassTypeAndMethods;
 import org.swdc.ours.common.type.Converter;
 import org.swdc.ours.common.type.Converters;
 import org.swdc.ours.common.type.JSONMapper;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
@@ -67,7 +70,7 @@ public class ApacheRequester implements HttpRequester {
             } else if (ClassTypeAndMethods.isBoxedType(body.getClass()) || ClassTypeAndMethods.isBasicType(body.getClass())) {
                 // 基本类型请求体
                 Converter converter = converters.getConverter(body.getClass(), String.class);
-                entity = new StringEntity((String) converter.convert(body));
+                entity = new StringEntity((String) converter.convert(body), StandardCharsets.UTF_8);
             } else if (body instanceof String) {
                 // String请求体
                 entity = new StringEntity((String) body);
@@ -77,7 +80,7 @@ public class ApacheRequester implements HttpRequester {
                 if (data == null) {
                     throw new IllegalArgumentException("Cannot convert body to JSON");
                 }
-                entity = new StringEntity(data);
+                entity = new StringEntity(data, StandardCharsets.UTF_8);
             }
             entityRequest.setEntity(entity);
         }
@@ -120,9 +123,12 @@ public class ApacheRequester implements HttpRequester {
                     HttpEntityEnclosingRequestBase entityRequest = (HttpEntityEnclosingRequestBase) request;
                     HttpEntity entity = null;
                     if (body instanceof File) {
-                        entity = new FileEntity((File) body);
+                        File file = (File) body;
+                        ListenableInputStream is = new ListenableInputStream(new FileInputStream(file), progressListener);
+                        entity = new InputStreamEntity(is,file.length());
                     } else if(body instanceof InputStream) {
-                        entity = new InputStreamEntity((InputStream) body);
+                        ListenableInputStream is = new ListenableInputStream((InputStream) body, progressListener);
+                        entity = new InputStreamEntity(is,is.available());
                     } else if (ClassTypeAndMethods.isBoxedType(body.getClass()) || ClassTypeAndMethods.isBasicType(body.getClass())) {
                         Converter converter = converters.getConverter(body.getClass(), String.class);
                         entity = new StringEntity((String) converter.convert(body));
@@ -140,7 +146,7 @@ public class ApacheRequester implements HttpRequester {
                 HttpResponse response = client.execute(request);
                 if (response.getStatusLine().getStatusCode() >= 200 && response.getStatusLine().getStatusCode() < 300) {
                     if (response.getEntity() == null) {
-                        progressListener.onProgress(NetworkDirection.RECEIVE, 1, 1);
+                        progressListener.onProgress(ProgressDirection.WRITE, 1, 1);
                         return;
                     }
                     InputStream is = response.getEntity().getContent();
@@ -150,10 +156,14 @@ public class ApacheRequester implements HttpRequester {
                     long current = 0;
                     int read;
                     while ((read = is.read(buffer)) != -1) {
-                        bodyHandler.accept(buffer);
-                        current += read;
-                        if (progressListener != null) {
-                            progressListener.onProgress(NetworkDirection.RECEIVE, current, total);
+                        try {
+                            bodyHandler.handle(buffer, read);
+                            current += read;
+                            if (progressListener != null) {
+                                progressListener.onProgress(ProgressDirection.WRITE, current, total);
+                            }
+                        } catch (CancelledException e) {
+                            return;
                         }
                     }
                 }

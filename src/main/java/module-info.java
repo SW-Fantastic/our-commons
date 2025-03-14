@@ -15,5 +15,6 @@ module swdc.commons {
     exports org.swdc.ours.common.annotations;
     exports org.swdc.ours.common.type;
     exports org.swdc.ours.common.network;
+    exports org.swdc.ours.common.helper;
 
 }

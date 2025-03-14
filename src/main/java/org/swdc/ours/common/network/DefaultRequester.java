@@ -1,7 +1,6 @@
 package org.swdc.ours.common.network;
 
-import org.swdc.ours.common.type.ClassTypeAndMethods;
-import org.swdc.ours.common.type.Converter;
+import org.swdc.ours.common.helper.ProgressDirection;
 import org.swdc.ours.common.type.Converters;
 import org.swdc.ours.common.type.JSONMapper;
 
@@ -117,7 +116,7 @@ public class DefaultRequester implements HttpRequester {
                         os.write(buffer, 0, read);
                         current += read;
                         if (progress != null) {
-                            progress.onProgress(NetworkDirection.SEND, current, total);
+                            progress.onProgress(ProgressDirection.WRITE, current, total);
                         }
                     }
                     os.flush();
@@ -133,10 +132,14 @@ public class DefaultRequester implements HttpRequester {
                     long current = 0;
                     int read;
                     while ((read = is.read(buffer)) != -1) {
-                        bodyHandler.accept(buffer);
-                        current += read;
-                        if (progress != null) {
-                            progress.onProgress(NetworkDirection.RECEIVE, current, total);
+                        try {
+                            bodyHandler.handle(buffer,read);
+                            current += read;
+                            if (progress != null) {
+                                progress.onProgress(ProgressDirection.READ, current, total);
+                            }
+                        } catch (CancelledException e) {
+                            return;
                         }
                     }
                 }
